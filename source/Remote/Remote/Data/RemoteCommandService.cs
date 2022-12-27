@@ -16,18 +16,36 @@ namespace Remote.Data
 
         public string ExecuteCommand()
         {
-            Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            clientSocket.Connect(new IPEndPoint(IPAddress.Parse(this.targetip), int.Parse(this.targetport)));
+            var host = this.targetip;
+            var port = Int16.Parse(this.targetport);
 
-            clientSocket.Send(Encoding.UTF8.GetBytes(this.command));
+            Socket client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
-            byte[] date = new byte[1024];
-            int count = clientSocket.Receive(date);
-            string? msg = Encoding.UTF8.GetString(date, 0, count);
+            try
+            {
+                client.Connect(new IPEndPoint(IPAddress.Parse(host), port));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return null;
+            }
 
-            Console.ReadKey();
-            clientSocket.Close();
-            return msg;
+            //var bytes = new byte[1024];
+            //var count = client.Receive(bytes);
+            //Console.WriteLine("New message from server: {0}", Encoding.UTF32.GetString(bytes, 0, count));
+
+            var input = this.command;
+            client.Send(Encoding.UTF8.GetBytes(input));
+            
+
+            var bytes = new byte[1024];
+            var count = client.Receive(bytes);
+            var recv = Encoding.UTF8.GetString(bytes, 0, count);
+            Console.WriteLine("New message from server: {0}", recv);
+
+            client.Close();
+            return recv;
         }
     }
 }
