@@ -4,6 +4,9 @@ using Remote.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// 設定靜態資產
+builder.WebHost.UseStaticWebAssets();
+
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
